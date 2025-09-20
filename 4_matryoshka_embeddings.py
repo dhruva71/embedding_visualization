@@ -34,6 +34,13 @@ for sentence in sentences:
 if len(openai_embeddings) == len(sentences) and len(openai_embeddings[0]) != 0:
     print(f'Received embeddings for {len(openai_embeddings)} sentences, embedding size: {len(openai_embeddings[0])}')
 #%% md
+# ## Verify unit length
+#%%
+import numpy as np
+
+# converted to float32, as float64 might add a tiny bit of error at the end
+np.linalg.norm(openai_embeddings[0]).astype(np.float32)
+#%% md
 # # Get cosine similarity between every pair
 #%%
 from sklearn.metrics.pairwise import cosine_distances, euclidean_distances, cosine_similarity
@@ -69,6 +76,22 @@ openai_embeddings_512 = [x[:512] for x in openai_embeddings]
 # ### Just to verify, let's look at the length of one
 #%%
 len(openai_embeddings_128[0])
+#%% md
+# ## Normalizing
+# OpenAI embeddings are normalized by default, but if you truncate by yourself, the normalization is lost
+#%%
+from sklearn.preprocessing import normalize
+
+openai_embeddings_64 = [normalize([x])[0] for x in openai_embeddings_64]
+openai_embeddings_128 = [normalize([x])[0] for x in openai_embeddings_128]
+openai_embeddings_256 = [normalize([x])[0] for x in openai_embeddings_256]
+openai_embeddings_512 = [normalize([x])[0] for x in openai_embeddings_512]
+#%% md
+# ## Verify length from one sample
+#%%
+np.linalg.norm(openai_embeddings_64[0])
+#%%
+np.array(openai_embeddings_64).shape
 #%% md
 # ## Let us recalculate similarities using less dimensions
 #%% md
